@@ -12,21 +12,6 @@ exports.index = asyncHandler(async (req, res, next) => {
     });
 });
 
-// POST request for posts 
-exports.post = async (req, res, next) => {
-    jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-        console.log(authData);
-        if (err) {
-            res.sendStatus(403);
-        } else {
-            res.json({
-                message: 'Post created...',
-                authData
-            });
-        }
-    })
-};
-
 // POST request for user sign in
 exports.login = asyncHandler(async (req, res, next) => {
     // Mock user
@@ -36,7 +21,7 @@ exports.login = asyncHandler(async (req, res, next) => {
         email: 'brad@gmail',
     }
 
-    jwt.sign({ user }, process.env.SECRET_KEY, { expiresIn: '30s' }, (err, token) => {
+    jwt.sign({ user }, process.env.SECRET_KEY, { expiresIn: '1d' }, (err, token) => {
         res.json({
             token
         });
