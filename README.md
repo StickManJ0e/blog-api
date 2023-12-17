@@ -5,8 +5,8 @@ User
 - username
 - email
 - password
-- posts
 - admin
+- posts
 - timestamp
 
 Posts
