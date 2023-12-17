@@ -8,5 +8,7 @@ const UserSchema = new Schema({
     password: {type: String, required: true},
     admin: {type: Boolean, default: false},
     timestamp: {type: Date, default: Date.now},
-    posts: {type: Schema.Types.ObjectId, ref: "Post"},
+    posts: {type: Schema.Types.ObjectId, ref: "Comment"}
 })
+
+module.exports = mongoose.model("User", UserSchema);
