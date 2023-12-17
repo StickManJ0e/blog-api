@@ -6,11 +6,18 @@ const post_controller = require('../controllers/postController')
 /* GET home page. */
 router.get('/', auth_controller.index);
 
-// POST request for User login
-router.post('/post', auth_controller.verifyToken, post_controller.post);
+/// AUTH Routes ///
+
+// Post request for User sign-up
+router.post('/sign-up', auth_controller.sign_up);
+
+// POST request for User sign-in
+router.post('/sign-in', auth_controller.sign_in);
+
+/// POST Routers ///
 
 // POST request for User login
-router.post('/login', auth_controller.login);
+router.post('/post', auth_controller.verifyToken, post_controller.post);
 
 
 module.exports = router;
