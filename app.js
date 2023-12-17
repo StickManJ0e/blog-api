@@ -21,12 +21,11 @@ async function main() {
 
 main().catch((err) => console.log(err));
 
-var indexRouter = require('./routes/index');
+const apiRouter = require('./routes/api');
 
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
@@ -35,7 +34,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.use('/', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
