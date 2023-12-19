@@ -7,20 +7,6 @@ const Post = require('../models/post');
 
 const app = express();
 
-// POST request for posts 
-exports.post = async (req, res, next) => {
-    jwt.verify(req.token, process.env.SECRET_KEY, (err, authData) => {
-        if (err) {
-            res.sendStatus(403);
-        } else {
-            res.json({
-                message: 'Post created...',
-                authData
-            });
-        }
-    })
-};
-
 // Handle fetch all blog posts on GET
 exports.get_blog_posts = asyncHandler(async (req, res, next) => {
     jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
@@ -30,6 +16,25 @@ exports.get_blog_posts = asyncHandler(async (req, res, next) => {
             return res.status(200).json({
                 allBlogPosts
             })
+        }
+    })
+})
+
+// Handle fetching details for a specific post on GET
+exports.get_blod_post = asyncHandler(async (req, res, next) => {
+    jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
+        if (err) { res.sendStatus(403); }
+        else {
+            const [post] = await Promise.all([
+                Post.findById(req.params.id).populate("comments").exec(),
+            ]);
+
+            if (post === null) {
+                // No results
+                return res.status(404).json({ message: 'Post not found' });
+            } else {
+                return res.status(200).json({ post });
+            }
         }
     })
 })
@@ -109,14 +114,17 @@ exports.update_blog_post = [
                 errors: errors.array()
             })
         } else {
-            const post = {
-                title: req.body.title,
-                content: req.body.content,
-            }
-            const updatedPost = await Post.findByIdAndUpdate(req.params.id, post, {})
-            return res.status(200).json({
-                updatedPost
-            });
+            jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
+                if (err) { res.sendStatus(403); }
+                const post = {
+                    title: req.body.title,
+                    content: req.body.content,
+                }
+                const updatedPost = await Post.findByIdAndUpdate(req.params.id, post, {})
+                return res.status(200).json({
+                    updatedPost
+                });
+            })
         }
     })
 ]

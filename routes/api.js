@@ -19,14 +19,14 @@ router.get('/log-out', auth_controller.log_out);
 
 /// POST Routers ///
 
-// POST request for User login
-router.post('/post', auth_controller.verifyToken, post_controller.post);
-
 // GET request for fetch all blog post data
 router.get('/posts', auth_controller.verifyToken, post_controller.get_blog_posts);
 
 // POST request for create blog post
 router.post('/posts', auth_controller.verifyToken, post_controller.create_blog_post);
+
+// GET request for fetching a specific blog posyt
+router.get('/posts/:id', auth_controller.verifyToken, post_controller.get_blod_post);
 
 // DELETE request for deleting a blog post
 router.delete('/posts/:id', post_controller.delete_blog_post);
