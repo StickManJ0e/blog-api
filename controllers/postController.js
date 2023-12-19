@@ -21,6 +21,19 @@ exports.post = async (req, res, next) => {
     })
 };
 
+// Handle fetch all blog posts on GET
+exports.get_blog_posts = asyncHandler(async (req, res, next) => {
+    jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
+        if (err) { res.sendStatus(403); }
+        else {
+            const allBlogPosts = await Post.find({}).sort({ timestamp: -1 }).populate('user').exec();
+            return res.status(200).json({
+                allBlogPosts
+            })
+        }
+    })
+})
+
 // Handle create blog post for User on POST
 exports.create_blog_post = [
     // Validate and sanitize fields
