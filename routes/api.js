@@ -8,11 +8,14 @@ router.get('/', auth_controller.index);
 
 /// AUTH Routes ///
 
-// Post request for User sign-up
+// POST request for User sign-up
 router.post('/sign-up', auth_controller.sign_up);
 
 // POST request for User sign-in
 router.post('/sign-in', auth_controller.sign_in);
+
+//GET request for User log out
+router.get('/log-out', auth_controller.log_out);
 
 /// POST Routers ///
 

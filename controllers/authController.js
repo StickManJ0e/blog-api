@@ -109,10 +109,18 @@ exports.sign_in = asyncHandler(async (req, res, next) => {
             if (err) { return next(err) }
             const body = { _id: user._id, username: user.username, admin: user.admin }
             const token = jwt.sign({ user: body }, process.env.SECRET_KEY, { expiresIn: '1d' })
-            
-            return res.status(200).json({body, token})
+
+            return res.status(200).json({ body, token })
         })
     })(req, res, next)
+});
+
+// Handle log out User on GET
+exports.log_out = asyncHandler(async (req, res, next) => {
+    req.logout((err)=> {
+        if (err) {return next (err)};
+    });
+    return res.status(200).json({message: "Logged out"});
 });
 
 // Verify Token Function

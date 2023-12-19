@@ -48,16 +48,13 @@ passport.use(
     try {
       const user = await User.findOne({ username: username });
       if (!user) {
-        console.log("incorrect username");
         return done(null, false, { message: "Incorrect username" });
       };
       // Compare hashed passwords
       const match = await bcrypt.compare(password, user.password);
       if (!match) {
-        console.log("incorrect password");
         return done(null, false, { message: "Incorrect password" });
       };
-      console.log("logged in!");
       return done(null, user);
     } catch (err) {
       return done(err);
