@@ -77,3 +77,11 @@ exports.create_blog_post = [
         }
     })
 ]
+
+// Handle deleting blog posts on POST
+exports.delete_blog_posts = asyncHandler(async (req, res, next) => {
+    await Post.findByIdAndDelete(req.body.postid);
+    return res.status(200).json({
+        message: `Post with if ${req.body.postid} deleted successfully,`
+    });
+})
