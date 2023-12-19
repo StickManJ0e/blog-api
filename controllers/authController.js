@@ -1,10 +1,13 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require("express-async-handler");
-const passport = require('passport');
 const { body, validationResult } = require("express-validator");
-const bcrypt = require("bcryptjs");
 require("dotenv").config();
+
+// Authentication
+const passport = require('passport');
+const LocalStrategy = require("passport-local").Strategy;
+const bcrypt = require("bcryptjs");
 
 // Test API Connection
 exports.index = asyncHandler(async (req, res, next) => {
@@ -94,18 +97,22 @@ exports.sign_up = [
 
 // Handle sign in for User on POST and return session token
 exports.sign_in = asyncHandler(async (req, res, next) => {
-    // Mock user
-    const user = {
-        id: 1,
-        username: 'brad',
-        email: 'brad@gmail',
-    }
+    passport.authenticate("local", function (err, user, info) {
+        if (err || !user) {
+            const error = new Error("User does not exist");
+            return res.status(403).json({
+                info
+            });
+        };
 
-    jwt.sign({ user }, process.env.SECRET_KEY, { expiresIn: '1d' }, (err, token) => {
-        res.json({
-            token
-        });
-    });
+        req.logIn(user, function (err) {
+            if (err) { return next(err) }
+            const body = { _id: user._id, username: user.username, admin: user.admin }
+            const token = jwt.sign({ user: body }, process.env.SECRET_KEY, { expiresIn: '1d' })
+            
+            return res.status(200).json({body, token})
+        })
+    })(req, res, next)
 });
 
 // Verify Token Function

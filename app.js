@@ -5,6 +5,14 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require("dotenv").config();
 
+// Authentication
+const passport = require('passport');
+const session = require('express-session');
+const LocalStrategy = require("passport-local").Strategy;
+const flash = require("express-flash");
+const bcrypt = require("bcryptjs");
+const User = require('./models/user');
+
 // Set up mongoose connection
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", false);
@@ -33,6 +41,53 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// PassportJS
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      const user = await User.findOne({ username: username });
+      if (!user) {
+        console.log("incorrect username");
+        return done(null, false, { message: "Incorrect username" });
+      };
+      // Compare hashed passwords
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) {
+        console.log("incorrect password");
+        return done(null, false, { message: "Incorrect password" });
+      };
+      console.log("logged in!");
+      return done(null, user);
+    } catch (err) {
+      return done(err);
+    }
+  })
+)
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
+})
+
+// Passport middlewares
+app.use(session({ secret: "cats", resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(flash());
+app.use(passport.session());
+
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+});
 
 app.use('/', apiRouter);
 
