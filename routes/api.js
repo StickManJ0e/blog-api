@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
 const auth_controller = require('../controllers/authController');
-const post_controller = require('../controllers/postController')
+const post_controller = require('../controllers/postController');
+const comment_controller = require('../controllers/commentsController');
 
 /* GET home page. */
 router.get('/', auth_controller.index);
@@ -34,5 +35,7 @@ router.delete('/posts/:id', post_controller.delete_blog_post);
 // PUT request for updating a blog post
 router.put('/posts/:id', auth_controller.verifyToken, post_controller.update_blog_post);
 
+// COMMENT Router //
+router.post('/posts/:postid/comments', auth_controller.verifyToken, comment_controller.create_comment);
 
 module.exports = router;
