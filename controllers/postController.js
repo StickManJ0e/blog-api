@@ -78,10 +78,45 @@ exports.create_blog_post = [
     })
 ]
 
-// Handle deleting blog posts on POST
-exports.delete_blog_posts = asyncHandler(async (req, res, next) => {
+// Handle deleting blog posts on DELETE
+exports.delete_blog_post = asyncHandler(async (req, res, next) => {
     await Post.findByIdAndDelete(req.body.postid);
     return res.status(200).json({
         message: `Post with if ${req.body.postid} deleted successfully,`
     });
-})
+});
+
+// Handle blog post editing on PUT
+exports.update_blog_post = [
+    // Validate and sanitize fields
+    body('title')
+        .trim()
+        .isLength({ min: 1 })
+        .withMessage("No title provided")
+        .escape(),
+    body("content")
+        .trim()
+        .isLength({ min: 1 })
+        .withMessage("No content provided")
+        .escape(),
+    // Process request after validation and sanitization 
+
+    asyncHandler(async (req, res, next) => {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(403).json({
+                errors: errors.array()
+            })
+        } else {
+            const post = {
+                title: req.body.title,
+                content: req.body.content,
+            }
+            const updatedPost = await Post.findByIdAndUpdate(req.params.id, post, {})
+            return res.status(200).json({
+                updatedPost
+            });
+        }
+    })
+]
