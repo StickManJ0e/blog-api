@@ -22,5 +22,8 @@ router.get('/log-out', auth_controller.log_out);
 // POST request for User login
 router.post('/post', auth_controller.verifyToken, post_controller.post);
 
+// POST request for create blog post
+router.post('/posts', auth_controller.verifyToken, post_controller.create_blog_post);
+
 
 module.exports = router;

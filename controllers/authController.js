@@ -117,10 +117,10 @@ exports.sign_in = asyncHandler(async (req, res, next) => {
 
 // Handle log out User on GET
 exports.log_out = asyncHandler(async (req, res, next) => {
-    req.logout((err)=> {
-        if (err) {return next (err)};
+    req.logout((err) => {
+        if (err) { return next(err) };
     });
-    return res.status(200).json({message: "Logged out"});
+    return res.status(200).json({ message: "Logged out" });
 });
 
 // Verify Token Function
