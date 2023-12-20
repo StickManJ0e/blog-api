@@ -46,4 +46,7 @@ router.post('/posts/:postid/comments', auth_controller.verifyToken, comment_cont
 // DELETE request for deleting a comment
 router.delete('/posts/:postid/comments/:id', auth_controller.verifyToken, comment_controller.delete_comment);
 
+// PUT request for editing a comment
+router.put('/posts/:id/comments/:id', auth_controller.verifyToken, comment_controller.update_comment);
+
 module.exports = router;

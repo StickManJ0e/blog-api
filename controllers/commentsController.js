@@ -61,15 +61,17 @@ exports.create_comment = [
     })
 ];
 
+// Handle deleting comments for User on DELETE
 exports.delete_comment = asyncHandler(async (req, res, next) => {
     jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
         if (err) { res.sendStatus(403); }
         else {
+            // Delete post reference to comment
             await Post.findOneAndUpdate(
                 { _id: req.params.postid },
                 { $pull: { comments: req.params.id } }
             );
-            console.log('working');
+            // Delete Comment with param id
             await Comment.findByIdAndDelete(req.params.id);
             return res.status(200).json({
                 message: `Comment with id ${req.params.id} deleted successfully,`
@@ -77,3 +79,35 @@ exports.delete_comment = asyncHandler(async (req, res, next) => {
         }
     })
 })
+
+// Handle editing comments for User on PUT
+exports.update_comment = [
+    // Validate and sanitize fields
+    body("content")
+        .trim()
+        .isLength({ min: 1 })
+        .withMessage("No content provided")
+        .escape(),
+    // Process request after validation and sanitization 
+
+    asyncHandler(async (req, res, next) => {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            return res.status(403).json({
+                errors: errors.array()
+            })
+        } else {
+            jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
+                if (err) { res.sendStatus(403); }
+                const comment = {
+                    content: req.body.content,
+                }
+                const updatedComment = await Comment.findByIdAndUpdate(req.params.id, comment, {})
+                return res.status(200).json({
+                    updatedComment
+                });
+            })
+        }
+    })
+]
