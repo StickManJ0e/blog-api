@@ -65,6 +65,11 @@ exports.delete_comment = asyncHandler(async (req, res, next) => {
     jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
         if (err) { res.sendStatus(403); }
         else {
+            await Post.findOneAndUpdate(
+                { _id: req.params.postid },
+                { $pull: { comments: req.params.id } }
+            );
+            console.log('working');
             await Comment.findByIdAndDelete(req.params.id);
             return res.status(200).json({
                 message: `Comment with id ${req.params.id} deleted successfully,`
