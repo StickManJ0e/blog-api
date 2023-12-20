@@ -12,7 +12,8 @@ exports.get_blog_posts = asyncHandler(async (req, res, next) => {
         else {
             const allBlogPosts = await Post.find({}).sort({ timestamp: -1 }).populate('user').exec();
             return res.status(200).json({
-                allBlogPosts
+                allBlogPosts,
+                authData
             })
         }
     })

@@ -5,6 +5,20 @@ require("dotenv").config();
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 
+// Handle fetching comments for User on GET
+exports.get_blog_comments = asyncHandler(async (req, res, next) => {
+    jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
+        if (err) { res.sendStatus(403); }
+        else {
+            const allComments = await Comment.find({post: req.params.postid}).sort({ timestamp: -1 }).populate('user').exec();
+            return res.status(200).json({
+                allComments,
+                authData
+            })
+        }
+    })
+})
+
 // Handle create comment for User on POST
 exports.create_comment = [
     // Validate and sanitize fields

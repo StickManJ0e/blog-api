@@ -36,6 +36,11 @@ router.delete('/posts/:id', auth_controller.verifyToken, post_controller.delete_
 router.put('/posts/:id', auth_controller.verifyToken, post_controller.update_blog_post);
 
 // COMMENT Router //
+
+//GET request to fetch all comments for a specific post
+router.get('/posts/:postid/comments', auth_controller.verifyToken, comment_controller.get_blog_comments);
+
+// POST request to create a comment
 router.post('/posts/:postid/comments', auth_controller.verifyToken, comment_controller.create_comment);
 
 module.exports = router;
