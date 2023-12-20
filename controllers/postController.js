@@ -1,11 +1,9 @@
-const express = require('express');
 const jwt = require('jsonwebtoken');
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require('express-validator');
 require("dotenv").config();
 const Post = require('../models/post');
-
-const app = express();
+const Comment = require('../models/comment');
 
 // Handle fetch all blog posts on GET
 exports.get_blog_posts = asyncHandler(async (req, res, next) => {
@@ -21,7 +19,7 @@ exports.get_blog_posts = asyncHandler(async (req, res, next) => {
 })
 
 // Handle fetching details for a specific post on GET
-exports.get_blod_post = asyncHandler(async (req, res, next) => {
+exports.get_blog_post = asyncHandler(async (req, res, next) => {
     jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
         if (err) { res.sendStatus(403); }
         else {
@@ -85,10 +83,26 @@ exports.create_blog_post = [
 
 // Handle deleting blog posts on DELETE
 exports.delete_blog_post = asyncHandler(async (req, res, next) => {
-    await Post.findByIdAndDelete(req.body.postid);
-    return res.status(200).json({
-        message: `Post with if ${req.body.postid} deleted successfully,`
-    });
+    jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
+        if (err) { res.sendStatus(403); }
+        else {
+            // Get details of the post and all comments (in parallel)
+            const [allCommentsInPost] = await Promise.all([
+                Comment.find({ post: req.body.postid }).exec(),
+            ]);
+
+            if (allCommentsInPost.length > 0) {
+                allCommentsInPost.forEach(async (comment) => {
+                    await Comment.findByIdAndDelete((comment._id.toString()));
+                });
+            };
+
+            await Post.findByIdAndDelete(req.body.postid);
+            return res.status(200).json({
+                message: `Post with if ${req.body.postid} deleted successfully,`
+            });
+        }
+    })
 });
 
 // Handle blog post editing on PUT

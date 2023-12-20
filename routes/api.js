@@ -27,10 +27,10 @@ router.get('/posts', auth_controller.verifyToken, post_controller.get_blog_posts
 router.post('/posts', auth_controller.verifyToken, post_controller.create_blog_post);
 
 // GET request for fetching a specific blog posyt
-router.get('/posts/:id', auth_controller.verifyToken, post_controller.get_blod_post);
+router.get('/posts/:id', auth_controller.verifyToken, post_controller.get_blog_post);
 
 // DELETE request for deleting a blog post
-router.delete('/posts/:id', post_controller.delete_blog_post);
+router.delete('/posts/:id', auth_controller.verifyToken, post_controller.delete_blog_post);
 
 // PUT request for updating a blog post
 router.put('/posts/:id', auth_controller.verifyToken, post_controller.update_blog_post);
