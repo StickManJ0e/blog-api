@@ -7,35 +7,33 @@ const Comment = require('../models/comment');
 
 // Handle fetch all blog posts on GET
 exports.get_blog_posts = asyncHandler(async (req, res, next) => {
-    jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
-        if (err) { res.sendStatus(403); }
-        else {
-            const allBlogPosts = await Post.find({}).sort({ timestamp: -1 }).populate('user').exec();
-            return res.status(200).json({
-                allBlogPosts,
-                authData
-            })
-        }
+    const allBlogPosts = await Post.find({}).sort({ timestamp: -1 }).populate('user').exec();
+    return res.status(200).json({
+        allBlogPosts
     })
 })
 
 // Handle fetching details for a specific post on GET
 exports.get_blog_post = asyncHandler(async (req, res, next) => {
-    jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
-        if (err) { res.sendStatus(403); }
-        else {
-            const [post] = await Promise.all([
-                Post.findById(req.params.id).populate("comments").exec(),
-            ]);
+    const [post] = await Promise.all([
+        Post
+            .findById(req.params.id)
+            .populate("comments")
+            .populate('user')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user'
+                }
+            }).exec(),
+    ]);
 
-            if (post === null) {
-                // No results
-                return res.status(404).json({ message: 'Post not found' });
-            } else {
-                return res.status(200).json({ post });
-            }
-        }
-    })
+    if (post === null) {
+        // No results
+        return res.status(404).json({ message: 'Post not found' });
+    } else {
+        return res.status(200).json({ post });
+    }
 })
 
 // Handle create blog post for User on POST
@@ -65,7 +63,7 @@ exports.create_blog_post = [
             const post = new Post({
                 title: req.body.title,
                 content: req.body.content,
-                user: req.user._id,
+                user: req.headers['user._id'],
             })
             // Verify token
             jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {

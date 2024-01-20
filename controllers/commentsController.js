@@ -31,6 +31,7 @@ exports.create_comment = [
 
     asyncHandler(async (req, res, next) => {
         const errors = validationResult(req);
+        console.log(req.params.postid)
 
         if (!errors.isEmpty()) {
             return res.status(403).json({
@@ -43,7 +44,7 @@ exports.create_comment = [
                 else {
                     const comment = new Comment({
                         content: req.body.content,
-                        user: req.user._id,
+                        user: req.headers['user._id'],
                         post: req.params.postid,
                     });
                     await comment.save();
@@ -66,6 +67,7 @@ exports.delete_comment = asyncHandler(async (req, res, next) => {
     jwt.verify(req.token, process.env.SECRET_KEY, async (err, authData) => {
         if (err) { res.sendStatus(403); }
         else {
+            console.log(req.params)
             // Delete post reference to comment
             await Post.findOneAndUpdate(
                 { _id: req.params.postid },
