@@ -26,6 +26,9 @@ router.get('/posts', post_controller.get_blog_posts);
 // POST request for create blog post
 router.post('/posts', auth_controller.verifyToken, post_controller.create_blog_post);
 
+// GET request for posts by a certain user
+router.get('/posts/user/:userid', post_controller.get_user_blog_posts);
+
 // GET request for fetching a specific blog posyt
 router.get('/posts/:id', post_controller.get_blog_post);
 

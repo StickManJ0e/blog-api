@@ -36,6 +36,14 @@ exports.get_blog_post = asyncHandler(async (req, res, next) => {
     }
 })
 
+// Handle fetching details for blog posts by a certain user on GET
+exports.get_user_blog_posts = asyncHandler(async (req, res, next) => {
+    const allBlogPosts = await Post.find({'user': req.headers['user._id']}).sort({ timestamp: -1 }).populate('user').exec();
+    return res.status(200).json({
+        allBlogPosts
+    })
+})
+
 // Handle create blog post for User on POST
 exports.create_blog_post = [
     // Validate and sanitize fields
@@ -87,7 +95,7 @@ exports.delete_blog_post = asyncHandler(async (req, res, next) => {
         else {
             // Get details of the post and all comments (in parallel)
             const [allCommentsInPost] = await Promise.all([
-                Comment.find({ post: req.body.postid }).exec(),
+                Comment.find({ post: req.headers['id'] }).exec(),
             ]);
 
             if (allCommentsInPost.length > 0) {
@@ -96,9 +104,9 @@ exports.delete_blog_post = asyncHandler(async (req, res, next) => {
                 });
             };
 
-            await Post.findByIdAndDelete(req.body.postid);
+            await Post.findByIdAndDelete(req.headers['id']);
             return res.status(200).json({
-                message: `Post with id ${req.body.postid} deleted successfully,`
+                message: `Post with id ${req.headers['id']} deleted successfully,`
             });
         }
     })
